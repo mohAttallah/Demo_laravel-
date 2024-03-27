@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\select;
+use App\Http\Controllers\staticView;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -37,3 +38,5 @@ Route::fallback(function () {
     $route = request()->url(); // Get the current URL
     return response("<h3>404 Not Found - Current Route: $route</h3>", 404);
 });
+
+Route::get('/staticPage', [staticView::class, 'index']);

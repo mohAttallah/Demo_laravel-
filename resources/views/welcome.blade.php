@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon DataTable</title>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
-</head>
-<body>
+@extends('layout')
+@section('welcome')
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+
+
     <table id="pokemonTable" class="display">
         <thead>
             <tr>
@@ -21,27 +18,21 @@
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-            var nextUrl = "https://pokeapi.co/api/v2/pokemon?offset=0&limit=20";
+            var nextUrl = @json($nextUrl); // Pass the value of $nextUrl to JavaScript
+
             var prevUrls = [];
 
             var table = $('#pokemonTable').DataTable({
                 "processing": true,
                 "serverSide": true,
-                "ajax": function (data, callback, settings) {
-                    $.ajax({
-                        url: nextUrl,
-                        success: function(response) {
-                            if (response.previous) prevUrls.push(response.previous);
-                            nextUrl = response.next;
+                "ajax": {
+                    "url": nextUrl, // Use the JavaScript variable nextUrl
+                    "dataSrc": function (response) {
+                        if (response.previous) prevUrls.push(response.previous);
+                        nextUrl = response.next;
 
-                            callback({
-                                draw: data.draw,
-                                recordsTotal: response.count,
-                                recordsFiltered: response.count,
-                                data: response.results
-                            });
-                        }
-                    });
+                        return response.results;
+                    }
                 },
                 "columns": [
                     { "data": "name" },
@@ -57,13 +48,13 @@
             $('#pokemonTable').on('page.dt', function() {
                 var pageInfo = table.page.info();
                 if (pageInfo.page + 1 === pageInfo.pages && nextUrl) {
-                    table.ajax.reload();
+                    table.ajax.url(nextUrl).load();
                 } else if (pageInfo.page === 0 && prevUrls.length > 0) {
                     nextUrl = prevUrls.pop();
-                    table.ajax.reload();
+                    table.ajax.url(nextUrl).load();
                 }
             });
         });
     </script>
-</body>
-</html>
+
+@endsection

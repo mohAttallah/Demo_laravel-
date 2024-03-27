@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 
 class select extends Controller
 {
-    public function index (){
-        return view('welcome');
-    }
+public function index()
+{
+    $nextUrl = 'https://pokeapi.co/api/v2/pokemon'; 
+
+    return view('welcome', ['nextUrl' => $nextUrl]);
+}
 }
